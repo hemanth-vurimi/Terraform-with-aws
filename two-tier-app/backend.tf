@@ -4,7 +4,6 @@ terraform {
     region       = "ap-south-1"
     key          = "dev-env/terraform.tfstate"
     use_lockfile = true
-    profile      = "terraform-dev"
     encrypt      = true
   }
 }
