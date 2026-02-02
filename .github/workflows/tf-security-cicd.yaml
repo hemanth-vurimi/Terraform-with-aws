@@ -26,10 +26,9 @@ jobs:
       # -------------------------
       # GITLEAKS - Secret Scan
       # -------------------------
-      - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          args: detect --verbose --redact
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # -------------------------
       # CHECKOV - Terraform Scan
