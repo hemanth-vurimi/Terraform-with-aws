@@ -1,4 +1,4 @@
-name: Terraform Pipeline
+name: Terraform Plan & Apply (Main)
 
 on:
   push:
@@ -8,11 +8,32 @@ on:
 jobs:
   plan:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: S3-cross-account-replication
+
     steps:
       - uses: actions/checkout@v4
 
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::202533539871:role/openIDroleforgithub
+          aws-region: ap-south-1
+
       - name: Terraform Init
         run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
@@ -21,20 +42,40 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tfplan
-          path: tfplan
+          path: two-tier-app/tfplan
 
   apply:
     needs: plan
     runs-on: ubuntu-latest
+
     environment:
-      name: production   # 👈 THIS causes manual approval
+      name: dev   # 🔐 REVIEWER TRIGGERS APPLY HERE
+
+    permissions:
+      contents: read
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: S3-cross-account-replication
+
     steps:
       - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::202533539871:role/openIDroleforgithub
+          aws-region: ap-south-1
 
       - name: Download plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
+          path: S3-cross-account-replication
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
