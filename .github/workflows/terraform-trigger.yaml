@@ -43,39 +43,42 @@ jobs:
         with:
           name: tfplan
           path: S3-cross-account-replication/tfplan
-
   apply:
     needs: plan
     runs-on: ubuntu-latest
-
+  
     environment:
-      name: dev   # 🔐 REVIEWER TRIGGERS APPLY HERE
-
+      name: dev   # 🔐 Approval happens here
+  
     permissions:
       contents: read
       id-token: write
-
+  
     defaults:
       run:
         working-directory: S3-cross-account-replication
-
+  
     steps:
       - uses: actions/checkout@v4
-
+  
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.4
-
+  
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::202533539871:role/openIDroleforgithub
           aws-region: ap-south-1
-
+  
+      - name: Terraform Init   # 🔑 REQUIRED
+        run: terraform init
+  
       - name: Download plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: S3-cross-account-replication
-
+  
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+
