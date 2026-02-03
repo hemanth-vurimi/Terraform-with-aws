@@ -11,13 +11,12 @@ terraform {
 
 provider "aws" {
   region  = "us-east-1"
-  profile = "terraform-dev"
 }
 
 provider "aws" {
   alias  = "dest"
   region = "us-west-1"
-    profile = "terraform-dev"
+    
 }
 
 # data "aws_ami" "ubuntu" {
