@@ -18,13 +18,16 @@ jobs:
         working-directory: S3-cross-account-replication
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.4
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::202533539871:role/openIDroleforgithub
           aws-region: ap-south-1
@@ -43,42 +46,48 @@ jobs:
         with:
           name: tfplan
           path: S3-cross-account-replication/tfplan
+
   apply:
     needs: plan
     runs-on: ubuntu-latest
-  
+
     environment:
-      name: dev   # 🔐 Approval happens here
-  
+      name: dev   # 🔐 Approval happens here (if reviewers exist)
+
     permissions:
       contents: read
       id-token: write
-  
+
     defaults:
       run:
         working-directory: S3-cross-account-replication
-  
+
     steps:
-      - uses: actions/checkout@v4
-  
-      - uses: hashicorp/setup-terraform@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.4
-  
-      - uses: aws-actions/configure-aws-credentials@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::202533539871:role/openIDroleforgithub
           aws-region: ap-south-1
-  
-      - name: Terraform Init   # 🔑 REQUIRED
-        run: terraform init
-  
+
+      # 🔑 STEP 1: Download plan FIRST
       - name: Download plan
         uses: actions/download-artifact@v4
         with:
           name: tfplan
           path: S3-cross-account-replication
-  
+
+      # 🔑 STEP 2: Init AGAIN in apply job
+      - name: Terraform Init
+        run: terraform init
+
+      # 🔑 STEP 3: Apply reviewed plan
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-
