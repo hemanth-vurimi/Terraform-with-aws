@@ -23,7 +23,7 @@ private_subnet_tags = {
     
 key_name = "vpc-peering-demo"
 instance_type    = "t3.micro"
-desired_capacity = 2
+desired_capacity = 1
 min_size         = 1
 max_size         = 3
 
