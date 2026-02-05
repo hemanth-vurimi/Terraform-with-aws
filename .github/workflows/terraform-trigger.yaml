@@ -3,7 +3,7 @@ name: Terraform Plan & Apply (Main)
 on:
   push:
     branches:
-      - main
+      - 
 
 jobs:
   plan:
