@@ -3,10 +3,10 @@ name: Terraform CI/CD with Security
 on:
   push:
     branches:
-      - main
+      - 
   pull_request:
     branches:
-      - main
+      - 
 
 env:
   TF_DIR: ./variables   # 👈 YOUR VARIABLES / ENV PATH
