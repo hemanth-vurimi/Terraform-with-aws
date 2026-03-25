@@ -3,10 +3,10 @@ name: Terraform CI/CD with Security
 on:
   push:
     branches:
-      - 
+      - main
   pull_request:
     branches:
-      - 
+      - main
 
 env:
   TF_DIR: ./variables   # 👈 YOUR VARIABLES / ENV PATH
@@ -64,10 +64,10 @@ jobs:
         working-directory: ${{ env.TF_DIR }}
         run: terraform plan -input=false -out=tfplan
 
-      # -------------------------
-      # Terraform Apply (ONLY on main push)
-      # -------------------------
-      - name: Terraform Apply
-        if: github.event_name == 'push'
-        working-directory: ${{ env.TF_DIR }}
-        run: terraform apply -input=false -auto-approve tfplan
+      # # -------------------------
+      # # Terraform Apply (ONLY on main push)
+      # # -------------------------
+      # - name: Terraform Apply
+      #   if: github.event_name == 'push'
+      #   working-directory: ${{ env.TF_DIR }}
+      #   run: terraform apply -input=false -auto-approve tfplan
